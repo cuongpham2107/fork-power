@@ -97,7 +97,7 @@ new class extends Component
                 </svg>
             </div>
         </div>
-        <h2 class="mt-6 text-center text-3xl font-black text-gray-900 tracking-tight">ForkPower</h2>
+        <h2 class="mt-6 text-center text-3xl font-black text-gray-900 tracking-tight">Quản lý sạc pin</h2>
         <p class="mt-2 text-center text-sm text-gray-500 font-medium">Đăng nhập để quản lý hệ thống</p>
     </div>
 

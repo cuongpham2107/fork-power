@@ -16,7 +16,7 @@ new class extends Component
 };
 ?>
 
-<div class="p-4 animate-page-entry">
+<div class="p-4 animate-page-entry px-4 pt-2">
     <div class="mb-8">
         <h1 class="text-2xl font-black text-gray-900 tracking-tight">Cá Nhân</h1>
         <p class="text-sm text-gray-500 font-medium">Thông tin tài khoản của bạn</p>

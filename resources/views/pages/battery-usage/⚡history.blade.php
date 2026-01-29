@@ -35,7 +35,7 @@ new class extends Component
 };
 ?>
 
-<div class="space-y-6 pt-4 pb-12 animate-page-entry">
+<div class="space-y-6 pt-4 pb-12 px-4 animate-page-entry">
     <div>
         <h1 class="text-2xl font-black text-gray-900 tracking-tight text-left sm:text-left">Lịch Sử Của Bạn</h1>
         <p class="text-sm text-gray-500 font-medium text-left sm:text-left">Danh sách lượt thay bình bạn đã thực hiện</p>

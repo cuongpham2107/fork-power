@@ -3,6 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#4F46E5">
+
+        <!-- iOS support -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
 
         <title>{{ $title ?? config('app.name') }}</title>
 
@@ -20,7 +27,7 @@
 
             {{-- main content, padded to avoid fixed tabs --}}
             <main class="flex-1 w-full {{ !request()->routeIs('login') ? 'pb-[96px]' : '' }}">
-                <div class="{{ !request()->routeIs('login') ? 'px-4 pt-2' : '' }}">
+                <div class="{{ !request()->routeIs('login') ? '' : '' }}">
                     {{ $slot }}
                 </div>
             </main>

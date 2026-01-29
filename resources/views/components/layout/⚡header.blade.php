@@ -16,6 +16,6 @@ new class extends Component {
             </svg>
             <h1 class="text-lg font-bold tracking-tight">Quản lý vận hành Pin sạc xe nâng</h1>
         </div>
-        <div class="px-2 py-0.5 bg-blue-500 rounded text-[10px] font-bold uppercase tracking-wider">v1.0</div>
+        <!-- <div class="px-2 py-0.5 bg-blue-500 rounded text-[10px] font-bold uppercase tracking-wider">v1.0</div> -->
     </div>
 </div>

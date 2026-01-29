@@ -26,8 +26,9 @@ new class extends Component
     public function with()
     {
         return [
-            'usages' => BatteryUsage::with(['forkLift', 'battery', 'installedBy'])
+            'usages' => BatteryUsage::with(['forkLift', 'battery', 'installedBy', 'removedBy'])
                 ->where('installed_by', Auth::id())
+                ->orWhere('removed_by', Auth::id())
                 ->orderBy('installed_at', 'desc')
                 ->paginate(15),
         ];
@@ -92,7 +93,7 @@ new class extends Component
                                 <p class="text-xs font-bold text-gray-700">{{ $this->formatDuration($usage->working_hours * 3600) }}</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2">
                             <div class="p-2 bg-gray-50 rounded-xl">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-gray-400">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
@@ -107,18 +108,38 @@ new class extends Component
 
                     <!-- Bottom section: Personnel & Datetime -->
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            @if($usage->installedBy->avatar)
-                                <img src="{{ $usage->installedBy->avatar }}" class="w-6 h-6 rounded-lg object-cover border border-gray-100" alt="Avatar">
-                            @else
-                                <div class="w-6 h-6 rounded-lg bg-blue-100 flex items-center justify-center text-[10px] text-blue-600 font-black shrink-0">
-                                    {{ substr($usage->installedBy->name ?? '?', 0, 1) }}
+                        <div class="flex flex-col gap-2.5">
+                            <!-- Người lắp -->
+                            <div class="flex items-center gap-2">
+                                @if($usage->installedBy->avatar)
+                                    <img src="{{ $usage->installedBy->avatar }}" class="w-6 h-6 rounded-lg object-cover border border-gray-100" alt="Avatar">
+                                @else
+                                    <div class="w-6 h-6 rounded-lg bg-blue-100 flex items-center justify-center text-[10px] text-blue-600 font-black shrink-0">
+                                        {{ substr($usage->installedBy->name ?? '?', 0, 1) }}
+                                    </div>
+                                @endif
+                                <div class="flex flex-col">
+                                    <span class="text-[9px] text-gray-400 font-bold italic leading-none uppercase tracking-tighter">Lắp bởi:</span>
+                                    <span class="text-[11px] font-bold text-gray-700 leading-tight">{{ $usage->installedBy->name ?? 'N/A' }}</span>
                                 </div>
-                            @endif
-                            <div class="flex flex-col">
-                                <span class="text-[10px] text-gray-400 font-medium italic leading-none">Người lắp:</span>
-                                <span class="text-[11px] font-bold text-gray-700">{{ $usage->installedBy->name ?? 'N/A' }}</span>
                             </div>
+                            
+                            <!-- Người tháo -->
+                            @if($usage->removedBy)
+                            <div class="flex items-center gap-2">
+                                @if($usage->removedBy->avatar)
+                                    <img src="{{ $usage->removedBy->avatar }}" class="w-6 h-6 rounded-lg object-cover border border-gray-100" alt="Avatar">
+                                @else
+                                    <div class="w-6 h-6 rounded-lg bg-red-100 flex items-center justify-center text-[10px] text-red-600 font-black shrink-0">
+                                        {{ substr($usage->removedBy->name ?? '?', 0, 1) }}
+                                    </div>
+                                @endif
+                                <div class="flex flex-col">
+                                    <span class="text-[9px] text-gray-400 font-bold italic leading-none uppercase tracking-tighter">Tháo bởi:</span>
+                                    <span class="text-[11px] font-bold text-gray-700 leading-tight">{{ $usage->removedBy->name ?? 'N/A' }}</span>
+                                </div>
+                            </div>
+                            @endif
                         </div>
                         <div class="text-right">
                             <p class="text-xs font-black text-gray-900 tracking-tight">{{ $usage->installed_at->format('d/m/Y') }}</p>

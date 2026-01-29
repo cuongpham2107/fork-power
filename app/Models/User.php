@@ -20,6 +20,11 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
+        'asgl_id',
+        'mobile_phone',
+        'avatar',
+        'department_name',
         'password',
     ];
 
@@ -44,5 +49,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function installedBatteryUsages()
+    {
+        return $this->hasMany(BatteryUsage::class, 'installed_by');
+    }
+
+    public function removedBatteryUsages()
+    {
+        return $this->hasMany(BatteryUsage::class, 'removed_by');
     }
 }

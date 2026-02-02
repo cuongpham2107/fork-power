@@ -29,8 +29,8 @@ new class extends Component
     // Install form
     public $installForm = [
         'battery_id' => '',
-        'charger_bar' => '',
-        'screen_bar' => '',
+        'charger_bar' => 2,
+        'screen_bar' => 50,
     ];
 
     // Remove form
@@ -179,7 +179,7 @@ new class extends Component
 };
 ?>
 
-<div class="p-2 animate-page-entry">
+<div class="animate-page-entry px-4 pt-2">
     <div class="mb-6 flex flex-col gap-4">
         <div class="flex flex-col gap-2">
             <h1 class="text-2xl font-bold text-gray-800 tracking-tight">Quản lý thay bình sạc</h1>
@@ -330,7 +330,7 @@ new class extends Component
     @if($showInstallModal)
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
-            <h3 class="text-lg font-bold mb-4">Lắp Bình Vào Xe</h3>
+            <h3 class="text-lg font-bold mb-4">Lắp Bình Vào Xe: {{ $forklifts->where('id', $selectedForkliftId)->first()->name }}</h3>
             
             <div class="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
                 <div>
@@ -415,7 +415,8 @@ new class extends Component
                             <span class="text-xs font-bold text-gray-400">1</span>
                             <input type="range" min="1" max="4" step="1" 
                                 wire:model.live="installForm.charger_bar" 
-                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none"
+                                class="w-full h-2 rounded-lg appearance-none cursor-pointer focus:outline-none accent-blue-600 transition-all border border-gray-100"
+                                :style="`background: linear-gradient(to right, #2563eb 0%, #2563eb ${($wire.installForm.charger_bar ? ($wire.installForm.charger_bar - 1) / 3 * 100 : 0)}%, #f3f4f6 ${($wire.installForm.charger_bar ? ($wire.installForm.charger_bar - 1) / 3 * 100 : 0)}%, #f3f4f6 100%)`"
                             >
                             <span class="text-xs font-bold text-gray-400">4</span>
                         </div>
@@ -430,11 +431,12 @@ new class extends Component
                                 <span x-text="$wire.installForm.screen_bar || 0"></span>%
                             </span>
                         </div>
-                        <div class="relative flex items-center gap-4">
+                        <div class="relative flex items-center gap-4 mb-2">
                             <span class="text-xs font-bold text-gray-400">0%</span>
                             <input type="range" min="0" max="100" step="1" 
                                 wire:model.live="installForm.screen_bar" 
-                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600 focus:outline-none"
+                                class="w-full h-2 rounded-lg appearance-none cursor-pointer focus:outline-none accent-green-600 transition-all border border-gray-100"
+                                :style="`background: linear-gradient(to right, #16a34a 0%, #16a34a ${$wire.installForm.screen_bar || 0}%, #f3f4f6 ${$wire.installForm.screen_bar || 0}%, #f3f4f6 100%)`"
                             >
                             <span class="text-xs font-bold text-gray-400">100%</span>
                         </div>

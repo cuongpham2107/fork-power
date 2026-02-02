@@ -49,7 +49,7 @@ new class extends Component {
     }
 };
 ?>
-<div class="space-y-6 pt-4 pb-12 animate-page-entry">
+<div class="space-y-6 pt-4 pb-12 animate-page-entry px-4">
     <!-- Personalized Header -->
     <div class="flex items-center justify-between">
         <div>

@@ -8,7 +8,7 @@ new class extends Component {
 
 ?>
 <!-- Header (top cho cảm giác app mobile) -->
-<div class="bg-blue-600 text-white w-full z-50 shadow-md" style="padding-top: env(safe-area-inset-top);">
+<div class="bg-blue-600 text-white w-full z-50 shadow-md fixed top-0" style="padding-top: env(safe-area-inset-top);">
     <div class="flex items-center justify-between p-4">
         <div class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-blue-200">

@@ -29,13 +29,15 @@ new class extends Component
     // Install form
     public $installForm = [
         'battery_id' => '',
+        'hour_initial' => 0,
         'charger_bar' => 2,
         'screen_bar' => 50,
     ];
 
     // Remove form
     public $removeForm = [
-        'hour_in' => '', // Display only
+        'hour_initial' => '', // Display only
+        'hour_out' => '',
     ];
 
     public function mount()
@@ -84,14 +86,26 @@ new class extends Component
     {
         $this->validate([
             'installForm.battery_id' => 'required|exists:batteries,id',
+            'installForm.hour_initial' => 'required|numeric|min:0',
             'installForm.charger_bar' => 'required',
             'installForm.screen_bar' => 'required',
         ], [
             'installForm.battery_id.required' => 'Vui lòng chọn một bình pin.',
             'installForm.battery_id.exists' => 'Bình pin đã chọn không hợp lệ.',
+            'installForm.hour_initial.required' => 'Vui lòng nhập số giờ vào.',
+            'installForm.hour_initial.numeric' => 'Số giờ vào phải là số.',
+            'installForm.hour_initial.min' => 'Số giờ vào không được nhỏ hơn 0.',
             'installForm.charger_bar.required' => 'Vui lòng chọn vạch pin nạp.',
             'installForm.screen_bar.required' => 'Vui lòng chọn vạch màn hình.',
         ]);
+
+        // Custom validation: hour_initial must be >= battery's total_working_hours
+        $battery = Battery::find($this->installForm['battery_id']);
+        if ($battery && $this->installForm['hour_initial'] < $battery->total_working_hours) {
+            $this->addError('installForm.hour_initial', 
+                'Số giờ vào phải lớn hơn hoặc bằng số giờ hiện tại của bình (' . number_format($battery->total_working_hours, 2) . 'h).');
+            return;
+        }
 
         $forklift = ForkLift::find($this->selectedForkliftId);
         if (! $forklift) {
@@ -107,7 +121,7 @@ new class extends Component
         BatteryUsage::create([
             'fork_lift_id' => $this->selectedForkliftId,
             'battery_id' => $this->installForm['battery_id'],
-            'hour_initial' => $battery->total_working_hours, // Automatically use battery hours
+            'hour_initial' => $this->installForm['hour_initial'], // Use form input value
             'charger_bar' => $this->installForm['charger_bar'],
             'screen_bar' => $this->installForm['screen_bar'],
             'installed_at' => now(),
@@ -127,22 +141,36 @@ new class extends Component
     public function openRemoveModal($usageId, $hourIn)
     {
         $this->selectedUsageId = $usageId;
-        $this->removeForm['hour_in'] = $hourIn;
+        $this->removeForm['hour_initial'] = $hourIn;
+        $this->removeForm['hour_out'] = '';
         $this->showRemoveModal = true;
     }
 
     public function removeBattery()
     {
+        $this->validate([
+            'removeForm.hour_out' => 'required|numeric|min:0',
+        ], [
+            'removeForm.hour_out.required' => 'Vui lòng nhập số giờ ra.',
+            'removeForm.hour_out.numeric' => 'Số giờ ra phải là số.',
+            'removeForm.hour_out.min' => 'Số giờ ra không được nhỏ hơn 0.',
+        ]);
+
         $usage = BatteryUsage::with('battery')->find($this->selectedUsageId);
         if (! $usage) {
             return;
         }
 
+        // Custom validation: hour_out must be >= hour_initial
+        if ($this->removeForm['hour_out'] < $usage->hour_initial) {
+            $this->addError('removeForm.hour_out', 
+                'Số giờ ra phải lớn hơn hoặc bằng số giờ vào (' . number_format($usage->hour_initial, 2) . 'h).');
+            return;
+        }
+
         $now = now();
-        $installedAt = \Carbon\Carbon::parse($usage->installed_at);
-        $diffSeconds = abs(now()->getTimestamp() - \Carbon\Carbon::parse($usage->installed_at)->getTimestamp());
-        $workingHours = round($diffSeconds / 3600, 2);
-        $hourOut = (float) $usage->hour_initial + (float) $workingHours;
+        $hourOut = (float) $this->removeForm['hour_out'];
+        $workingHours = $hourOut - (float) $usage->hour_initial;
 
         $usage->update([
             'hour_out' => $hourOut,
@@ -203,7 +231,7 @@ new class extends Component
     </div>
 
     <!-- Forklift List with Loading State -->
-    <div class="relative min-h-[400px]">
+    <div class="relative min-h-100">
         <!-- Loading Spinner -->
         <div wire:loading wire:target="search" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-100/50 backdrop-blur-[1px] rounded-2xl transition-all">
             <div class="flex flex-col items-center gap-3 p-6 bg-white rounded-2xl shadow-xl border border-gray-100">
@@ -351,7 +379,7 @@ new class extends Component
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-2 max-h-[320px] overflow-y-auto p-1 custom-scrollbar">
+                    <div class="flex flex-col gap-2 max-h-80 overflow-y-auto p-1 custom-scrollbar">
                         @forelse($availableBatteries as $bat)
                             <button 
                                 wire:click="$set('installForm.battery_id', {{ $bat->id }})"
@@ -403,8 +431,23 @@ new class extends Component
                 </div>
 
                 <div class="space-y-6">
+                    <!-- Number hour_initial Input -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-bold text-gray-700">Số Giờ Vào</label>
+                        <input 
+                            type="number" 
+                            step="0.01"
+                            wire:model.live="installForm.hour_initial"
+                            class="block w-full px-4 py-2 border border-gray-200 rounded-xl bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
+                            placeholder="Nhập số giờ vào của bình"
+                            required
+                        >
+                        @error('installForm.hour_initial') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                    </div>
+
                     <!-- Charger Bar Slider -->
                     <div class="space-y-3">
+                        
                         <div class="flex justify-between items-center">
                             <label class="text-sm font-bold text-gray-700">Vạch Pin Nạp (Máy Nạp)</label>
                             <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg font-bold text-sm">
@@ -488,7 +531,22 @@ new class extends Component
                         </div>
                     </div>
                 </div>
-                <p class="text-sm text-gray-500 text-center px-4">Xác nhận tháo bình? Hệ thống sẽ tự động tính toán tổng số giờ làm việc dựa trên thời gian thực tế.</p>
+
+                <!-- Hour Out Input -->
+                <div class="space-y-3">
+                    <label class="block text-sm font-bold text-gray-700">Số Giờ Ra</label>
+                    <input 
+                        type="number" 
+                        step="0.01"
+                        wire:model.live="removeForm.hour_out"
+                        class="block w-full px-4 py-2 border border-gray-200 rounded-xl bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
+                        placeholder="Nhập số giờ ra của bình"
+                        required
+                    >
+                    @error('removeForm.hour_out') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <p class="text-sm text-gray-500 text-center px-4">Xác nhận tháo bình? Hệ thống sẽ tính số giờ làm việc = Giờ Ra - Giờ Vào.</p>
                 @endif
             </div>
 

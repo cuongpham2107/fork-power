@@ -9,7 +9,7 @@ new class extends Component
 ?>
 
 <div>
-<nav class="bg-white border-t fixed bottom-0 w-full max-w-md left-1/2 -translate-x-1/2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]"
+<nav class="bg-white border-t fixed bottom-0 w-full left-1/2 -translate-x-1/2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]"
      style="padding-bottom: env(safe-area-inset-bottom);">
     <div class="flex justify-around items-center px-2 py-1">
         <!-- Home -->

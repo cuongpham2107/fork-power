@@ -26,8 +26,9 @@
             @endif
 
             {{-- main content, padded to avoid fixed tabs --}}
-            <main class="flex-1 w-full {{ !request()->routeIs('login') ? 'pb-[96px]' : '' }}">
-                <div class="{{ !request()->routeIs('login') ? '' : '' }}">
+
+            <main class="flex-1 w-full {{ !request()->routeIs('login') ? 'pb-24' : '' }}">
+                <div class="{{ !request()->routeIs('login') ? 'px-4 pt-2' : '' }}">
                     {{ $slot }}
                 </div>
             </main>

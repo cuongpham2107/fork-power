@@ -16,7 +16,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         @livewireStyles
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     </head>
     <body class="bg-gray-100 font-sans antialiased">
         <div class="min-h-screen flex flex-col w-full">

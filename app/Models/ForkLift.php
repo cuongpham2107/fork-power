@@ -10,6 +10,7 @@ class ForkLift extends Model
         'name',
         'brand',
         'model',
+        'total_working_hours',
         'status',
     ];
 

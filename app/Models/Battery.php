@@ -12,12 +12,11 @@ class Battery extends Model
         'capacity',
         'voltage',
         'size',
-        'total_working_hours',
         'status',
     ];
 
     protected $casts = [
-        'total_working_hours' => 'decimal:2',
+        
     ];
 
     public function batteryUsages()

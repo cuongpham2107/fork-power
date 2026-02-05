@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name'); // Komatsu 01, Toyota 02
             $table->string('brand'); // KOMATSU, TOYOTA
             $table->string('model'); // Model name
+            $table->decimal('total_working_hours', 10, 2)->default(0); // Số giờ hoạt động trên màn hình
             $table->enum('status', ['active', 'inactive', 'maintenance'])->default('active'); // Hoạt động, không hoạt động, bảo trì
             $table->timestamps();
         });

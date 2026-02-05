@@ -36,11 +36,6 @@ class BatteryForm
                                     ->label('Điện áp'),
                                 TextInput::make('size')
                                     ->label('Kích thước'),
-                                TextInput::make('total_working_hours')
-                                    ->label('Tổng giờ làm việc')
-                                    ->numeric()
-                                    ->default(0)
-                                    ->required(),
                                 Select::make('status')
                                     ->label('Trạng thái')
                                     ->options([

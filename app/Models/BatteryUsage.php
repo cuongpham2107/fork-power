@@ -23,7 +23,7 @@ class BatteryUsage extends Model
 
     protected $casts = [
         'charger_bar' => 'integer',
-        'screen_bar' => 'decimal:2',
+        'screen_bar' => 'integer',
         'hour_initial' => 'decimal:2',
         'installed_at' => 'datetime',
         'hour_out' => 'decimal:2',

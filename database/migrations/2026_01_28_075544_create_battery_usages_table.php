@@ -16,20 +16,20 @@ return new class extends Migration
             $table->foreignId('battery_id')->constrained('batteries')->onDelete('cascade');
             $table->foreignId('fork_lift_id')->constrained('fork_lifts')->onDelete('cascade');
 
-            //Dữ liệu lúc lắp
-            $table->integer('charger_bar')->nullable(); //Số vạch hiển thị trên máy nạp 1-4
-            $table->decimal('screen_bar', 8, 2)->nullable(); //Số vạch hiển thị trên màn hình
+            // Dữ liệu lúc lắp
+            $table->integer('charger_bar')->nullable(); // Số vạch hiển thị trên máy nạp 1-4
+            $table->integer('screen_bar')->nullable(); // Số vạch hiển thị trên màn hình 1-10
             $table->decimal('hour_initial', 10, 2)->nullable(); // Số giờ lắp vào
             $table->timestamp('installed_at')->nullable(); // Thời gian lắp pin
 
-            //Dữ liệu lúc tháo 
+            // Dữ liệu lúc tháo
             $table->decimal('hour_out', 10, 2)->nullable(); // Số giờ tháo ra
             $table->timestamp('removed_at')->nullable(); // Thời gian tháo pin
 
-            //Kết quả
+            // Kết quả
             $table->decimal('working_hours', 10, 2)->nullable(); // Số giờ làm việc hour_out - hour_in
 
-            //Người thao tác 
+            // Người thao tác
             $table->foreignId('installed_by')->nullable()->constrained('users')->onDelete('set null');
 
             $table->foreignId('removed_by')->nullable()->constrained('users')->onDelete('set null');

@@ -19,7 +19,6 @@ class BatterySeeder extends Seeder
             'capacity' => '100Ah',
             'voltage' => '24V',
             'size' => '200x150x100mm',
-            'total_working_hours' => 1250.00,
             'status' => 'standby',
         ]);
 
@@ -29,7 +28,6 @@ class BatterySeeder extends Seeder
             'capacity' => '200Ah',
             'voltage' => '48V',
             'size' => '300x200x150mm',
-            'total_working_hours' => 446.00, // Starts at 446
             'status' => 'in_use',
         ]);
 
@@ -39,7 +37,6 @@ class BatterySeeder extends Seeder
             'capacity' => '150Ah',
             'voltage' => '36V',
             'size' => '250x180x120mm',
-            'total_working_hours' => 9.50, // Starts at 9.5
             'status' => 'in_use',
         ]);
     }

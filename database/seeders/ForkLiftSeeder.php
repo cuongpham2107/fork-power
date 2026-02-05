@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\ForkLift;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ForkLiftSeeder extends Seeder
@@ -18,6 +17,7 @@ class ForkLiftSeeder extends Seeder
             'brand' => 'KOMATSU',
             'model' => 'FD30T-16',
             'status' => 'active',
+            'total_working_hours' => 1000,
         ]);
 
         ForkLift::create([
@@ -25,6 +25,7 @@ class ForkLiftSeeder extends Seeder
             'brand' => 'TOYOTA',
             'model' => '7FBRU25',
             'status' => 'active',
+            'total_working_hours' => 2000,
         ]);
 
         ForkLift::create([
@@ -32,6 +33,7 @@ class ForkLiftSeeder extends Seeder
             'brand' => 'HYSTER',
             'model' => 'H3.00XM',
             'status' => 'maintenance',
+            'total_working_hours' => 3000,
         ]);
     }
 }

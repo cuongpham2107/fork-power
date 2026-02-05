@@ -3,6 +3,7 @@
 use App\Models\Battery;
 use App\Models\BatteryUsage;
 use App\Models\ForkLift;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -31,7 +32,7 @@ new class extends Component
         'battery_id' => '',
         'hour_initial' => 0,
         'charger_bar' => 2,
-        'screen_bar' => 50,
+        'screen_bar' => 5,
     ];
 
     // Remove form
@@ -80,6 +81,11 @@ new class extends Component
         $this->selectedForkliftId = $forkliftId;
         $this->reset('installForm');
         $this->showInstallModal = true;
+
+        $forklift = ForkLift::find($forkliftId);
+        if ($forklift) {
+            $this->installForm['hour_initial'] = $forklift->total_working_hours;
+        }
     }
 
     public function installBattery()
@@ -99,11 +105,12 @@ new class extends Component
             'installForm.screen_bar.required' => 'Vui lòng chọn vạch màn hình.',
         ]);
 
-        // Custom validation: hour_initial must be >= battery's total_working_hours
-        $battery = Battery::find($this->installForm['battery_id']);
-        if ($battery && $this->installForm['hour_initial'] < $battery->total_working_hours) {
-            $this->addError('installForm.hour_initial', 
-                'Số giờ vào phải lớn hơn hoặc bằng số giờ hiện tại của bình (' . number_format($battery->total_working_hours, 2) . 'h).');
+        // Custom validation: hour_initial must be >= forklift's total_working_hours
+        $forklift = ForkLift::find($this->selectedForkliftId);
+        if ($forklift && $this->installForm['hour_initial'] < $forklift->total_working_hours) {
+            $this->addError('installForm.hour_initial',
+                'Số giờ vào phải lớn hơn hoặc bằng số giờ hiện tại của xe ('.number_format($forklift->total_working_hours, 2).'h).');
+
             return;
         }
 
@@ -163,8 +170,9 @@ new class extends Component
 
         // Custom validation: hour_out must be >= hour_initial
         if ($this->removeForm['hour_out'] < $usage->hour_initial) {
-            $this->addError('removeForm.hour_out', 
-                'Số giờ ra phải lớn hơn hoặc bằng số giờ vào (' . number_format($usage->hour_initial, 2) . 'h).');
+            $this->addError('removeForm.hour_out',
+                'Số giờ ra phải lớn hơn hoặc bằng số giờ vào ('.number_format($usage->hour_initial, 2).'h).');
+
             return;
         }
 
@@ -180,15 +188,20 @@ new class extends Component
             'status' => 'finished',
         ]);
 
-        // Update Battery Total Hours & Status
+        // Update Battery Status
         $usage->battery->update([
             'status' => 'standby',
+        ]);
+
+        // Update ForkLift Total Hours
+        $usage->forkLift->update([
             'total_working_hours' => $hourOut,
         ]);
 
         $this->showRemoveModal = false;
         $this->refreshData();
     }
+
     public function formatDuration($seconds)
     {
         $hours = floor($seconds / 3600);
@@ -257,15 +270,24 @@ new class extends Component
                                 <h3 class="text-lg font-bold text-gray-900 leading-tight">{{ $forklift->code ?? $forklift->name }}</h3>
                                 <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">{{ $forklift->brand }}</span>
                             </div>
-                            @if($isActive)
-                                <span class="px-2.5 py-1 bg-green-50 text-green-700 text-[10px] font-bold rounded-full border border-green-100 uppercase tracking-tighter">Đang sử dụng ({{ $forklift->activeUsages->count() }})</span>
-                            @else
-                                <span class="px-2.5 py-1 bg-gray-50 text-gray-500 text-[10px] font-bold rounded-full border border-gray-100 uppercase tracking-tighter">Trống</span>
-                            @endif
+                            <div class="flex flex-col items-end gap-2">
+                                @if($isActive)
+                                    <span class="px-2.5 py-0.5 bg-green-50 text-green-700 text-[10px] font-bold rounded-full border border-green-100 uppercase tracking-tighter">Đang sử dụng</span>
+                                @else
+                                    <span class="px-2.5 py-0.5 bg-gray-50 text-gray-500 text-[10px] font-bold rounded-full border border-gray-100 uppercase tracking-tighter">Trống</span>
+                                @endif
+                                <span class="flex flex-row items-center gap-1 px-2.5 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-full border border-green-100 tracking-tighter">
+                                    <svg  xmlns="http://www.w3.org/2000/svg" width="15" height="15"  
+                                        fill="currentColor" viewBox="0 0 24 24" >
+                                        <!--Boxicons v3.0.8 https://boxicons.com | License  https://docs.boxicons.com/free-->
+                                        <path d="M12 2C6.58 2 2 6.58 2 12s4.58 10 10 10 10-4.58 10-10S17.42 2 12 2m0 18c-4.34 0-8-3.66-8-8s3.66-8 8-8 8 3.66 8 8-3.66 8-8 8"></path><path d="M13 7h-2v6h6v-2h-4z"></path>
+                                    </svg>
+                                    {{ $forklift->total_working_hours }} giờ</span>
+                            </div>
                         </div>
         
                         @if($isActive)
-                            <div class="space-y-2.5">
+                            <div class="space-y-2">
                                 @foreach($forklift->activeUsages as $usage)
                                     <!-- Active Battery Info -->
                                     <div class="bg-blue-50/50 rounded-xl p-3 border border-blue-100/50 group relative hover:bg-blue-50 transition-colors shadow-xs">
@@ -305,18 +327,28 @@ new class extends Component
                                         </div>
 
                                         <!-- Bottom Stats Grid -->
-                                        <div class="grid grid-cols-3 gap-2 py-2 border-t border-blue-100/30">
-                                            <div class="flex flex-col">
-                                                <span class="text-[8px] text-blue-800/40 uppercase font-black tracking-widest">Giờ vào</span>
-                                                <span class="text-[10px] font-bold text-blue-900 leading-tight tabular-nums">{{ $usage->hour_initial }}h</span>
+                                        <div class="grid grid-cols-2 gap-2 py-2 border-t border-blue-100/30">
+                                            <div class="flex flex-col border-x border-blue-100/30 px-2 min-w-[80px]">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-[8px] text-blue-800/40 uppercase font-black tracking-widest mb-1">Vạch sạc</span>
+                                                    <span class="text-[10px] font-bold text-blue-900 leading-tight">{{ $usage->charger_bar }} vạch</span>
+                                                </div>
+                                                <div class="flex gap-0.5 h-3">
+                                                    @for($i = 1; $i <= 4; $i++)
+                                                        <div class="w-full rounded-sm {{ $i <= $usage->charger_bar ? 'bg-blue-500' : 'bg-gray-200' }}"></div>
+                                                    @endfor
+                                                </div>
                                             </div>
-                                            <div class="flex flex-col border-x border-blue-100/30 px-2">
-                                                <span class="text-[8px] text-blue-800/40 uppercase font-black tracking-widest">Vạch sạc</span>
-                                                <span class="text-[10px] font-bold text-blue-900 leading-tight">{{ $usage->charger_bar }} vạch</span>
-                                            </div>
-                                            <div class="flex flex-col items-end">
-                                                <span class="text-[8px] text-blue-800/40 uppercase font-black tracking-widest">Màn hình</span>
-                                                <span class="text-[10px] font-bold text-blue-900 leading-tight">{{ $usage->screen_bar }} %</span>
+                                            <div class="flex flex-col min-w-[100px]">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-[8px] text-blue-800/40 uppercase font-black tracking-widest mb-1">Màn hình</span>
+                                                    <span class="text-[10px] font-bold text-blue-900 leading-tight">{{ $usage->screen_bar }} vạch</span>
+                                                </div>
+                                                <div class="flex gap-0.5 h-3 w-full">
+                                                    @for($i = 1; $i <= 10; $i++)
+                                                        <div class="w-full rounded-sm {{ $i <= $usage->screen_bar ? 'bg-green-500' : 'bg-gray-200' }}"></div>
+                                                    @endfor
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -325,22 +357,21 @@ new class extends Component
                         @else
                             <!-- No Battery State -->
                             <div class="bg-gray-50/50 rounded-xl p-3 mb-4 border border-gray-100 text-center py-5 border-dashed">
-                                <span class="text-gray-400 text-xs font-medium italic">Sẵn sàng lắp bình</span>
+                                <span class="text-gray-400 text-xs font-medium italic block mb-3">Sẵn sàng lắp bình</span>
+                                <button 
+                                    wire:click="openInstallModal({{ $forklift->id }})"
+                                    class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-blue-400">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                    Lắp Bình
+                                </button>
                             </div>
                         @endif
                     </div>
 
-                    <div class="mt-4">
-                        <button 
-                            wire:click="openInstallModal({{ $forklift->id }})"
-                            class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-blue-400">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                            Lắp Thêm Bình
-                        </button>
-                    </div>
+
                 </div>
             @empty
                 <div class="col-span-full py-20 bg-white rounded-2xl border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-400">
@@ -383,8 +414,15 @@ new class extends Component
                         @forelse($availableBatteries as $bat)
                             <button 
                                 wire:click="$set('installForm.battery_id', {{ $bat->id }})"
-                                class="flex items-center justify-between p-3 border rounded-xl transition-all {{ $installForm['battery_id'] == $bat->id ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-100 hover:border-gray-300 bg-white shadow-sm' }}"
+                                class="relative flex items-center justify-between p-3 border rounded-xl transition-all {{ $installForm['battery_id'] == $bat->id ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-100 hover:border-gray-300 bg-white shadow-sm' }}"
                             >
+                                @if($installForm['battery_id'] == $bat->id)
+                                    <div class="absolute top-0 right-0 p-1 text-blue-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                            <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                @endif
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 {{ $installForm['battery_id'] == $bat->id ? 'bg-blue-100 text-blue-600' : '' }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
@@ -397,8 +435,8 @@ new class extends Component
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="text-[10px] text-gray-400 font-bold uppercase mb-0.5">Số giờ</div>
-                                    <div class="text-sm font-black text-gray-700 leading-none">{{ number_format($bat->total_working_hours, 2) }}h</div>
+                                    <div class="text-[10px] text-gray-400 font-bold uppercase mb-0.5"></div>
+                                    <div class="text-sm font-black text-gray-700 leading-none"></div>
                                 </div>
                             </button>
                         @empty
@@ -407,42 +445,15 @@ new class extends Component
                     </div>
                     @error('installForm.battery_id') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
-                
-                <div>
-                    @php
-                        $selectedBat = $availableBatteries->firstWhere('id', $installForm['battery_id']);
-                    @endphp
-                    @if($selectedBat)
-                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex justify-between items-center">
-                            <div>
-                                <div class="text-[10px] text-blue-500 font-bold uppercase tracking-wider">Số giờ hiện tại</div>
-                                <div class="text-xl font-black text-blue-900">{{ number_format($selectedBat->total_working_hours, 2) }}h</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-[10px] text-blue-500 font-bold uppercase tracking-wider">Mã bình</div>
-                                <div class="text-sm font-bold text-blue-900">{{ $selectedBat->code }}</div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-4 text-center text-sm text-gray-400">
-                            Vui lòng chọn bình để xem số giờ
-                        </div>
-                    @endif
-                </div>
 
                 <div class="space-y-6">
                     <!-- Number hour_initial Input -->
+                    <!-- Number hour_initial Display -->
                     <div class="space-y-3">
                         <label class="block text-sm font-bold text-gray-700">Số Giờ Vào</label>
-                        <input 
-                            type="number" 
-                            step="0.01"
-                            wire:model.live="installForm.hour_initial"
-                            class="block w-full px-4 py-2 border border-gray-200 rounded-xl bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
-                            placeholder="Nhập số giờ vào của bình"
-                            required
-                        >
-                        @error('installForm.hour_initial') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        <div class="block w-full px-4 py-2 border border-blue-100 rounded-xl bg-blue-50 text-sm font-bold text-blue-900">
+                             {{ number_format($installForm['hour_initial'] ?? 0, 2) }}h
+                        </div>
                     </div>
 
                     <!-- Charger Bar Slider -->
@@ -469,19 +480,19 @@ new class extends Component
                     <!-- Screen Bar Slider -->
                     <div class="space-y-3">
                         <div class="flex justify-between items-center">
-                            <label class="text-sm font-bold text-gray-700">Vạch Màn Hình (%)</label>
+                            <label class="text-sm font-bold text-gray-700">Vạch Màn Hình</label>
                             <span class="px-3 py-1 bg-green-100 text-green-700 rounded-lg font-bold text-sm">
-                                <span x-text="$wire.installForm.screen_bar || 0"></span>%
+                                <span x-text="$wire.installForm.screen_bar || 0"></span> vạch
                             </span>
                         </div>
                         <div class="relative flex items-center gap-4 mb-2">
-                            <span class="text-xs font-bold text-gray-400">0%</span>
-                            <input type="range" min="0" max="100" step="1" 
+                            <span class="text-xs font-bold text-gray-400">1</span>
+                            <input type="range" min="1" max="10" step="1" 
                                 wire:model.live="installForm.screen_bar" 
                                 class="w-full h-2 rounded-lg appearance-none cursor-pointer focus:outline-none accent-green-600 transition-all border border-gray-100"
-                                :style="`background: linear-gradient(to right, #16a34a 0%, #16a34a ${$wire.installForm.screen_bar || 0}%, #f3f4f6 ${$wire.installForm.screen_bar || 0}%, #f3f4f6 100%)`"
+                                :style="`background: linear-gradient(to right, #16a34a 0%, #16a34a ${($wire.installForm.screen_bar ? ($wire.installForm.screen_bar - 1) / 9 * 100 : 0)}%, #f3f4f6 ${($wire.installForm.screen_bar ? ($wire.installForm.screen_bar - 1) / 9 * 100 : 0)}%, #f3f4f6 100%)`"
                             >
-                            <span class="text-xs font-bold text-gray-400">100%</span>
+                            <span class="text-xs font-bold text-gray-400">10</span>
                         </div>
                         @error('installForm.screen_bar') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
@@ -522,7 +533,7 @@ new class extends Component
 
                     <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
                         <div>
-                            <div class="text-[10px] text-gray-400 font-bold uppercase">Giờ lúc vào</div>
+                            <div class="text-[10px] text-gray-400 font-bold uppercase">Số giờ vào</div>
                             <div class="text-lg font-bold text-gray-700">{{ $usage->hour_initial }}h</div>
                         </div>
                         <div>
@@ -540,7 +551,7 @@ new class extends Component
                         step="0.01"
                         wire:model.live="removeForm.hour_out"
                         class="block w-full px-4 py-2 border border-gray-200 rounded-xl bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
-                        placeholder="Nhập số giờ ra của bình"
+                        placeholder="Nhập số giờ ra hiển thị trên xe"
                         required
                     >
                     @error('removeForm.hour_out') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror

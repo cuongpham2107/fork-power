@@ -27,10 +27,6 @@ class BatteriesTable extends BaseTable
                 TextColumn::make('size')
                     ->label('Kích thước')
                     ->searchable(),
-                TextColumn::make('total_working_hours')
-                    ->label('Tổng giờ làm việc')
-                    ->numeric()
-                    ->sortable(),
                 TextColumn::make('status')
                     ->label('Trạng thái')
                     ->badge()

@@ -25,16 +25,15 @@
                 <livewire:layout.header />
             @endif
 
-            {{-- main content, padded to avoid fixed header and tabs --}}
-            <main class="flex-1 w-full {{ !request()->routeIs('login') ? 'pt-16 pb-24' : '' }}">
+            {{-- main content, padded to avoid fixed header --}}
+            <main class="flex-1 w-full {{ !request()->routeIs('login') ? 'pt-16 pb-6' : '' }}">
                 <div class="w-full mx-auto px-4">
                     {{ $slot }}
                 </div>
             </main>
 
             @if (!request()->routeIs('login'))
-                {{-- fixed bottom tabs (Livewire) --}}
-                <livewire:layout.tabs />
+                {{-- No footer for now --}}
             @endif
         </div>
 

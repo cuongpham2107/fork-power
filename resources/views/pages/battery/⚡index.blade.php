@@ -222,9 +222,19 @@ new class extends Component
 
 <div class="animate-page-entry px-4 pt-2">
     <div class="mb-6 flex flex-col gap-4">
-        <div class="flex flex-col gap-2">
-            <h1 class="text-2xl font-bold text-gray-800 tracking-tight">Quản lý thay bình sạc</h1>
-            <p class="text-sm text-gray-500 font-medium text-left sm:text-left">Danh sách các xe nâng và bình sạc sử dụng</p>
+        <div class="flex flex-row justify-between items-center gap-2">
+           <div>
+                <h1 class="text-2xl font-bold text-gray-800 tracking-tight">Quản lý thay bình sạc</h1>
+                <p class="text-sm text-gray-500 font-medium text-left sm:text-left">Danh sách các xe nâng và bình sạc sử dụng</p>
+            </div>
+            <a href="{{ url('/history') }}" class="flex flex-row items-center gap-1">
+                <div class="{{ request()->is('history*') ? 'bg-blue-600 text-white' : 'text-gray-400 group-hover:bg-gray-100' }} rounded-xl transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <span class="text-sm font-medium {{ request()->is('history*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}">Lịch sử</span>
+            </a>
         </div>
 
         <!-- Search Input -->

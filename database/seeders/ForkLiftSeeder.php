@@ -15,7 +15,7 @@ class ForkLiftSeeder extends Seeder
         ForkLift::create([
             'name' => 'Komatsu 01',
             'brand' => 'KOMATSU',
-            'model' => 'FD30T-16',
+            'serial_number' => 'A31-00001',
             'status' => 'active',
             'total_working_hours' => 1000,
         ]);
@@ -23,7 +23,7 @@ class ForkLiftSeeder extends Seeder
         ForkLift::create([
             'name' => 'Toyota 02',
             'brand' => 'TOYOTA',
-            'model' => '7FBRU25',
+            'serial_number' => 'A31-00002',
             'status' => 'active',
             'total_working_hours' => 2000,
         ]);
@@ -31,7 +31,7 @@ class ForkLiftSeeder extends Seeder
         ForkLift::create([
             'name' => 'Hyster 03',
             'brand' => 'HYSTER',
-            'model' => 'H3.00XM',
+            'serial_number' => 'M236-846149',
             'status' => 'maintenance',
             'total_working_hours' => 3000,
         ]);

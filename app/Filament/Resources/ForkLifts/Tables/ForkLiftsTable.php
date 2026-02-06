@@ -18,8 +18,11 @@ class ForkLiftsTable extends BaseTable
                 TextColumn::make('brand')
                     ->label('Thương hiệu')
                     ->searchable(),
-                TextColumn::make('model')
-                    ->label('Model')
+                TextColumn::make('serial_number')
+                    ->label('Số serial')
+                    ->searchable(),
+                TextColumn::make('total_working_hours')
+                    ->label('Tổng giờ hoạt động')
                     ->searchable(),
                 TextColumn::make('status')
                     ->label('Trạng thái')

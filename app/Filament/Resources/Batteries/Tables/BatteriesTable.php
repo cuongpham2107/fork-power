@@ -12,6 +12,9 @@ class BatteriesTable extends BaseTable
     {
         return parent::configure($table)
             ->columns([
+                TextColumn::make('serial_number')
+                    ->label('Serial number')
+                    ->searchable(),
                 TextColumn::make('code')
                     ->label('Mã pin')
                     ->searchable(),
@@ -27,6 +30,10 @@ class BatteriesTable extends BaseTable
                 TextColumn::make('size')
                     ->label('Kích thước')
                     ->searchable(),
+                TextColumn::make('used_at')
+                    ->label('Ngày sử dụng')
+                    ->date('d/m/Y')
+                    ->sortable(),
                 TextColumn::make('status')
                     ->label('Trạng thái')
                     ->badge()

@@ -7,16 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Battery extends Model
 {
     protected $fillable = [
+        'serial_number',
         'code',
         'type',
         'capacity',
         'voltage',
         'size',
+        'used_at',
         'status',
-    ];
-
-    protected $casts = [
-        
     ];
 
     public function batteryUsages()

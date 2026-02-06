@@ -9,7 +9,7 @@ class ForkLift extends Model
     protected $fillable = [
         'name',
         'brand',
-        'model',
+        'serial_number',
         'total_working_hours',
         'status',
     ];

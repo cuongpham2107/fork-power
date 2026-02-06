@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('batteries', function (Blueprint $table) {
             $table->id();
+            $table->string('serial_number')->unique();
             $table->string('code')->unique(); // 19, 11, VII 455, VII 470
             $table->string('type')->nullable(); // Loại pin // Lithium, Alkaline
             $table->string('capacity')->nullable(); // Dung lượng pin // 100Ah, 200Ah
             $table->string('voltage')->nullable(); // Điện áp pin // 12V, 24V
             $table->string('size')->nullable(); // Kích thước pin // 200x150x100mm
+            // năm đưa vào sử dụng
+            $table->date('used_at')->nullable();
             $table->enum('status', ['standby', 'in_use', 'charging', 'maintenance'])->default('standby'); // standby, in_use, charging, maintenance
             $table->timestamps();
         });

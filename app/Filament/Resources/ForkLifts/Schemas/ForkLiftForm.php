@@ -30,8 +30,12 @@ class ForkLiftForm
                                 TextInput::make('brand')
                                     ->label('Thương hiệu')
                                     ->required(),
-                                TextInput::make('model')
-                                    ->label('Model')
+                                TextInput::make('serial_number')
+                                    ->label('Số serial')
+                                    ->required(),
+                                TextInput::make('total_working_hours')
+                                    ->label('Tổng giờ hoạt động')
+                                    ->numeric()
                                     ->required(),
                                 Select::make('status')
                                     ->label('Trạng thái')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Batteries\Schemas;
 
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
@@ -25,6 +26,9 @@ class BatteryForm
                                 'xl' => 3,
                             ])
                             ->schema([
+                                TextInput::make('serial_number')
+                                    ->label('Serial number')
+                                    ->required(),
                                 TextInput::make('code')
                                     ->label('Mã pin')
                                     ->required(),
@@ -36,6 +40,9 @@ class BatteryForm
                                     ->label('Điện áp'),
                                 TextInput::make('size')
                                     ->label('Kích thước'),
+                                DatePicker::make('used_at')
+                                    ->label('Ngày sử dụng'),
+
                                 Select::make('status')
                                     ->label('Trạng thái')
                                     ->options([

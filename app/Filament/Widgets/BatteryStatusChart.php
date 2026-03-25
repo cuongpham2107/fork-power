@@ -11,6 +11,8 @@ class BatteryStatusChart extends ChartWidget
 
     protected static ?int $sort = 3;
 
+    protected int|string|array $columnSpan = 2;
+
     protected function getData(): array
     {
         $active = Battery::where('status', 'active')->count();

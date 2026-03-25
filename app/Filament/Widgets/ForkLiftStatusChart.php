@@ -11,6 +11,8 @@ class ForkLiftStatusChart extends ChartWidget
 
     protected static ?int $sort = 4;
 
+    protected int|string|array $columnSpan = 1;
+
     protected function getData(): array
     {
         $active = ForkLift::where('status', 'active')->count();

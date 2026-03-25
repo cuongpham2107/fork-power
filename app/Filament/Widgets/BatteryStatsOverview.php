@@ -14,7 +14,7 @@ class BatteryStatsOverview extends BaseWidget
 
     protected int|array|null $columns = 5;
 
-    protected int|string|array $columnSpan = 1;
+    protected int|string|array $columnSpan = "full";
 
     protected function getStats(): array
     {

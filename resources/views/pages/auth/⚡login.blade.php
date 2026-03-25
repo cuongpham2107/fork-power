@@ -38,14 +38,23 @@ new class extends Component
                     'login' => $this->username,
                     'password' => $this->password,
                 ]);
-
+                // dd($response->json());
                 if ($response->successful()) {
                     $userResponse = $response->json()['data']['user'];
 
                     // Find or create local user
                     $user = \App\Models\User::where('asgl_id', $userResponse['id'])
                         ->orWhere('username', $userResponse['username'])
+                        ->orWhere(function($q) use ($userResponse) {
+                            if (!empty($userResponse['email'])) {
+                                $q->where('email', $userResponse['email']);
+                            }
+                        })
                         ->first();
+
+                    $email = !empty($userResponse['email']) 
+                        ? $userResponse['email'] 
+                        : (strtolower($userResponse['username']) . '@asgl.net.vn');
 
                     $userData = [
                         'name' => $userResponse['full_name'],
@@ -54,19 +63,19 @@ new class extends Component
                         'asgl_id' => $userResponse['id'],
                         'avatar' => $userResponse['avatar'],
                         'department_name' => $userResponse['positions'][0]['department']['short_code'] ?? null,
+                        'email' => $email,
                     ];
 
                     if ($user) {
                         $user->update($userData);
                     } else {
                         $user = \App\Models\User::create(array_merge($userData, [
-                            'email' => $userResponse['email'] ?? ($userResponse['username'] . '@asgl.net.vn'),
                             'password' => Str::password(),
                         ]));
                     }
                 }
             } catch (\Exception $e) {
-                // Log the exception if needed
+                // dd($e);
             }
         }
 

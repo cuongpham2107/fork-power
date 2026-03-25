@@ -23,6 +23,10 @@ class ForkLiftResource extends Resource
 
     protected static ?string $navigationLabel = 'Xe nâng';
 
+    protected static ?string $modelLabel = 'Xe nâng';
+
+    protected static ?string $pluralModelLabel = 'Xe nâng';
+
     protected static string|UnitEnum|null $navigationGroup = 'Quản lý thiết bị';
 
     protected static ?int $navigationSort = 4;

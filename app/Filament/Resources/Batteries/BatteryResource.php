@@ -23,6 +23,10 @@ class BatteryResource extends Resource
 
     protected static ?string $navigationLabel = 'Pin';
 
+    protected static ?string $modelLabel = 'Pin';
+
+    protected static ?string $pluralModelLabel = 'Pin';
+
     protected static string|UnitEnum|null $navigationGroup = 'Quản lý thiết bị';
 
     protected static ?int $navigationSort = 2;

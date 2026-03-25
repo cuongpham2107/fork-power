@@ -23,6 +23,10 @@ class BatteryChargerResource extends Resource
 
     protected static ?string $navigationLabel = 'Máy sạc';
 
+    protected static ?string $modelLabel = 'Máy sạc';
+
+    protected static ?string $pluralModelLabel = 'Máy sạc';
+
     protected static string|UnitEnum|null $navigationGroup = 'Quản lý thiết bị';
 
     protected static ?int $navigationSort = 3;

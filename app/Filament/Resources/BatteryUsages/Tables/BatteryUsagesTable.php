@@ -33,24 +33,26 @@ class BatteryUsagesTable extends BaseTable
                     ->alignCenter()
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('installed_at')
-                    ->label('Thời gian lắp')
-                    ->dateTime()
-                    ->sortable(),
+                
                 TextColumn::make('hour_out')
                     ->label('Số giờ tháo ra')
                     ->alignCenter()
                     ->numeric()
-                    ->sortable(),
-                TextColumn::make('removed_at')
-                    ->label('Thời gian tháo')
-                    ->dateTime()
                     ->sortable(),
                 TextColumn::make('working_hours')
                     ->label('Số giờ làm việc')
                     ->alignCenter()
                     ->numeric()
                     ->sortable(),
+                TextColumn::make('installed_at')
+                    ->label('Thời gian lắp')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('removed_at')
+                    ->label('Thời gian tháo')
+                    ->dateTime()
+                    ->sortable(),
+                
                 TextColumn::make('installedBy.name')
                     ->label('Người lắp')
                     ->sortable(),

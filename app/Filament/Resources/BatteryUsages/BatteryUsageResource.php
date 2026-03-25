@@ -23,7 +23,11 @@ class BatteryUsageResource extends Resource
 
     protected static ?string $navigationLabel = 'Sử dụng pin';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Quản lý thiết bị';
+    protected static ?string $modelLabel = 'Sử dụng pin';
+
+    protected static ?string $pluralModelLabel = 'Sử dụng pin';
+
+    // protected static string|UnitEnum|null $navigationGroup = 'Quản lý thiết bị';
 
     protected static ?int $navigationSort = 5;
 

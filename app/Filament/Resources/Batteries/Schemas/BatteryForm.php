@@ -27,13 +27,13 @@ class BatteryForm
                             ])
                             ->schema([
                                 TextInput::make('serial_number')
-                                    ->label('Serial number')
+                                    ->label('Số serial')
                                     ->required(),
                                 TextInput::make('code')
-                                    ->label('Mã pin')
+                                    ->label('Số bình')
                                     ->required(),
                                 TextInput::make('type')
-                                    ->label('Loại pin'),
+                                    ->label('Loại bình'),
                                 TextInput::make('capacity')
                                     ->label('Dung lượng'),
                                 TextInput::make('voltage')

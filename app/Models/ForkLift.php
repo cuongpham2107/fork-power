@@ -12,6 +12,7 @@ class ForkLift extends Model
         'serial_number',
         'total_working_hours',
         'status',
+        'dvql'
     ];
 
     protected $casts = [

@@ -13,10 +13,10 @@ class BatteriesTable extends BaseTable
         return parent::configure($table)
             ->columns([
                 TextColumn::make('serial_number')
-                    ->label('Serial number')
+                    ->label('Số serial')
                     ->searchable(),
                 TextColumn::make('code')
-                    ->label('Mã pin')
+                    ->label('Số bình')
                     ->searchable(),
                 TextColumn::make('type')
                     ->label('Loại pin')

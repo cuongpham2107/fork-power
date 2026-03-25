@@ -220,7 +220,8 @@ new class extends Component
 };
 ?>
 
-<div class="animate-page-entry px-4 pt-2">
+<div>
+    <div class="animate-page-entry px-4 pt-2">
     <div class="mb-6 flex flex-col gap-4">
         <div class="flex flex-row justify-between items-center gap-2">
            <div>
@@ -330,17 +331,17 @@ new class extends Component
                                                 @endif
                                                 <span class="text-[10px] text-blue-800/60 font-bold truncate">{{ $usage->installedBy->name ?? 'N/A' }}</span>
                                             </div>
-                                            <div class="flex items-center gap-1.5 bg-white/80 px-2 py-0.5 rounded-full border border-blue-100/50 shadow-xs">
+                                            <!-- <div class="flex items-center gap-1.5 bg-white/80 px-2 py-0.5 rounded-full border border-blue-100/50 shadow-xs">
                                                 <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                                                 <span class="text-[9px] font-black text-blue-900">{{ $this->formatDuration(abs(now()->getTimestamp() - \Carbon\Carbon::parse($usage->installed_at)->getTimestamp())) }}</span>
-                                            </div>
+                                            </div> -->
                                         </div>
 
                                         <!-- Bottom Stats Grid -->
                                         <div class="grid grid-cols-2 gap-2 py-2 border-t border-blue-100/30">
                                             <div class="flex flex-col border-x border-blue-100/30 px-2 min-w-[80px]">
                                                 <div class="flex items-center justify-between">
-                                                    <span class="text-[8px] text-blue-800/40 uppercase font-black tracking-widest mb-1">Vạch sạc</span>
+                                                    <span class="text-[8px] text-blue-800/80 font-black tracking-widest mb-1">Vạch sạc</span>
                                                     <span class="text-[10px] font-bold text-blue-900 leading-tight">{{ $usage->charger_bar }} vạch</span>
                                                 </div>
                                                 <div class="flex gap-0.5 h-3">
@@ -351,7 +352,7 @@ new class extends Component
                                             </div>
                                             <div class="flex flex-col min-w-[100px]">
                                                 <div class="flex items-center justify-between">
-                                                    <span class="text-[8px] text-blue-800/40 uppercase font-black tracking-widest mb-1">Màn hình</span>
+                                                    <span class="text-[8px] text-blue-800/80 font-black tracking-widest mb-1">Màn hình</span>
                                                     <span class="text-[10px] font-bold text-blue-900 leading-tight">{{ $usage->screen_bar }} vạch</span>
                                                 </div>
                                                 <div class="flex gap-0.5 h-3 w-full">
@@ -392,6 +393,7 @@ new class extends Component
                     <button wire:click="$set('search', '')" class="mt-2 text-blue-500 text-xs font-bold hover:underline">Xóa tìm kiếm</button>
                 </div>
             @endforelse
+        </div>
         </div>
     </div>
 
@@ -441,12 +443,12 @@ new class extends Component
                                     </div>
                                     <div class="text-left">
                                         <div class="font-black text-gray-900 leading-none mb-1">{{ $bat->code }}</div>
-                                        <div class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{{ $bat->type }}</div>
+                                        <div class="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{{ $bat->type }} <span class="mx-1 text-gray-300">•</span> seri: {{ $bat->serial_number }}</div>
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="text-[10px] text-gray-400 font-bold uppercase mb-0.5"></div>
-                                    <div class="text-sm font-black text-gray-700 leading-none"></div>
+                                    <div class="text-[10px] text-gray-400 font-bold uppercase mb-0.5">{{ $bat->voltage }}V</div>
+                                    <div class="text-sm font-black text-gray-700 leading-none">{{ $bat->capacity }}Ah</div>
                                 </div>
                             </button>
                         @empty
@@ -458,12 +460,18 @@ new class extends Component
 
                 <div class="space-y-6">
                     <!-- Number hour_initial Input -->
-                    <!-- Number hour_initial Display -->
+                    <!-- Number hour_initial Input -->
                     <div class="space-y-3">
                         <label class="block text-sm font-bold text-gray-700">Số Giờ Vào</label>
-                        <div class="block w-full px-4 py-2 border border-blue-100 rounded-xl bg-blue-50 text-sm font-bold text-blue-900">
-                             {{ number_format($installForm['hour_initial'] ?? 0, 2) }}h
-                        </div>
+                        <input 
+                            type="number" 
+                            step="0.01"
+                            wire:model.live="installForm.hour_initial"
+                            class="block w-full px-4 py-2 border border-gray-200 rounded-xl bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
+                            placeholder="Nhập số giờ vào"
+                            required
+                        >
+                        @error('installForm.hour_initial') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
 
                     <!-- Charger Bar Slider -->

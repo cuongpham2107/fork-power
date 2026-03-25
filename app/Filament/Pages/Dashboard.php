@@ -23,13 +23,18 @@ class Dashboard extends BaseDashboard
             BatteryUsageChart::class,
             BatteryStatusChart::class,
             ForkLiftStatusChart::class,
-            AccountWidget::class,
-            FilamentInfoWidget::class,
+            // AccountWidget::class,
+            // FilamentInfoWidget::class,
         ];
     }
 
     public function getHeaderWidgetsColumns(): int|array
     {
         return 1;
+    }
+
+    public function getColumns(): int | array
+    {
+        return 5;
     }
 }
